@@ -5,11 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Validator;
-use App\Models\contacts;
+use App\Models\{contacts,User,cities,properties,categories};
 class api extends Controller {
     
     public function home(){
-        return "Hello wrold";
+        return [
+            'categories' => categories::latest()->get(),
+            'cities' => cities::latest()->get(),
+            'newest' => properties::latest()->take(7)->get(),
+            'users' => User::latest()->take(7)->get(),
+            'popular' => properties::latest()->take(7)->orderBy('price','DESC')->get(),
+        ];
     }
 
     public function contact(Request $request){
