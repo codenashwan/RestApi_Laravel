@@ -5,29 +5,46 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Validator;
-use App\Models\{contacts,User,cities,properties,categories};
-class api extends Controller {
-    
-    public function home(){
+use App\Models\{contacts, User, cities, properties, categories};
+
+class api extends Controller
+{
+
+    public function home(Request $request)
+    {
+        info($request->all());
         return [
             'categories' => categories::latest()->get(),
             'cities' => cities::latest()->get(),
-            'newest' => properties::latest()->take(7)->get(),
+            'newest' => properties::OfUser($request->user_id)
+                ->OfCategory($request->category_id)
+                ->OfCity($request->city_id)
+                ->OfSearch($request->search)
+                ->OfPrice($request->price)
+                ->latest()
+                ->take(7)
+                ->get(),
             'users' => User::latest()->take(7)->get(),
-            'popular' => properties::latest()->take(7)->orderBy('price','DESC')->get(),
+            'popular' => properties::latest()
+                ->OfCategory($request->category_id)
+                ->OfCity($request->city_id)
+                ->OfSearch($request->search)
+                ->OfPrice($request->price)
+                ->take(7)->orderBy('price', 'DESC')->get(),
         ];
     }
 
-    public function contact(Request $request){
+    public function contact(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'full_name' => 'required|min:3',
             'email' => 'required|email',
             'phonenumber' => 'required|min:11',
             'message' => 'required|min:3',
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()->all()], 401);
-        }else{
+        } else {
             contacts::create([
                 'full_name' => $request->full_name,
                 'email' => $request->email,
@@ -36,8 +53,5 @@ class api extends Controller {
             ]);
             return response()->json(['success' => 'Message sent successfully'], 200);
         }
-
     }
-
-
 }
