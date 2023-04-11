@@ -70,4 +70,17 @@ class properties extends Model
             return $query;
         }
     }
+
+    public function category()
+    {
+        return $this->belongsTo(categories::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function city()
+    {
+        return $this->belongsTo(cities::class);
+    }
 }

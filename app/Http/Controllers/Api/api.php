@@ -54,4 +54,29 @@ class api extends Controller
             return response()->json(['success' => 'Message sent successfully'], 200);
         }
     }
+
+    public function properties(Request $request)
+    {
+        return properties::latest()
+            ->OfCategory($request->category_id)
+            ->OfCity($request->city_id)
+            ->OfSearch($request->search)
+            ->OfPrice($request->price)
+            ->OfUser($request->user_id)
+            ->orderBy('price', 'DESC')->paginate(10);
+    }
+
+    public function property(Request $request)
+    {
+        return properties::with(['category', 'user', 'city'])->findOrFail($request->id);
+    }
+
+    public function users(Request $request)
+    {
+        return User::latest()->paginate(10);
+    }
+    public function user(Request $request)
+    {
+        return User::findOrFail($request->id);
+    }
 }
