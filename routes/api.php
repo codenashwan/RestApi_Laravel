@@ -11,6 +11,7 @@ Route::group(['middleware' => ['json']], function () {
     Route::get('properties/{id}', [App\Http\Controllers\Api\api::class, 'property']);
     Route::get('users', [App\Http\Controllers\Api\api::class, 'users']);
     Route::get('users/{id}', [App\Http\Controllers\Api\api::class, 'user']);
+    Route::post('login', [App\Http\Controllers\Api\api::class, 'login']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

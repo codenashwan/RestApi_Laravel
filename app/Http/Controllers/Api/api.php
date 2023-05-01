@@ -6,10 +6,32 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\{contacts, User, cities, properties, categories};
+use Nette\Utils\Validators;
+use Hash;
 
 class api extends Controller
 {
 
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required',
+        ]);
+        if (!$validator->fails()) {
+            $user = User::where('email', $request->email)->first();
+            if (Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'token' => $user->createToken('authToken')->plainTextToken,
+                    'user' => $user
+                ]);
+            } else {
+                return response()->json(['errors' => [__('auth.failed')]], 401);
+            }
+        } else {
+            return response()->json(['errors' => $validator->errors()->all()], 401);
+        }
+    }
     public function home(Request $request)
     {
         info($request->all());
