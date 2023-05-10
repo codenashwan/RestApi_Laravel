@@ -12,8 +12,21 @@ Route::group(['middleware' => ['json']], function () {
     Route::get('users', [App\Http\Controllers\Api\api::class, 'users']);
     Route::get('users/{id}', [App\Http\Controllers\Api\api::class, 'user']);
     Route::post('login', [App\Http\Controllers\Api\api::class, 'login']);
+
+
+    Route::group(['middleware' => ['auth:sanctum']], function () {
+
+
+        Route::post('logout', [App\Http\Controllers\Api\api::class, 'logout']);
+
+        
+    });
 });
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
+
+
+
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });

@@ -32,6 +32,11 @@ class api extends Controller
             return response()->json(['errors' => $validator->errors()->all()], 401);
         }
     }
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
+        return response()->json(['success' => 'Logged out successfully'], 200);
+    }
     public function home(Request $request)
     {
         info($request->all());
