@@ -90,6 +90,15 @@ class api extends Controller
             }
         }
     }
+    public function sendVerificationEmail(Request $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json("User already verified", 200);
+        } else {
+            $request->user()->sendEmailVerificationNotification();
+            return response()->json("Email verification link sent on your email", 200);
+        }
+    }
     public function home(Request $request)
     {
         info($request->all());
