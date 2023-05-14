@@ -8,6 +8,7 @@ use Validator;
 use App\Models\{contacts, User, cities, properties, categories};
 use Nette\Utils\Validators;
 use Hash;
+use Illuminate\Auth\Events\Registered;
 
 class api extends Controller
 {
@@ -36,6 +37,34 @@ class api extends Controller
     {
         $request->user()->tokens()->delete();
         return response()->json(['success' => 'Logged out successfully'], 200);
+    }
+
+    public function register(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:3',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
+
+        if (!$validator->fails()) {
+
+            $user  = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password)
+            ]);
+
+            event(new Registered($user));
+
+            return response()->json([
+                'token' => $user->createToken('authToken')->plainTextToken,
+                'user' => $user
+            ]);
+        } else {
+            return response()->json(['errors' => $validator->errors()->all()], 401);
+        }
     }
     public function home(Request $request)
     {
