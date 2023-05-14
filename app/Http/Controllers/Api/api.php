@@ -9,6 +9,7 @@ use App\Models\{contacts, User, cities, properties, categories};
 use Nette\Utils\Validators;
 use Hash;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
 
 class api extends Controller
 {
@@ -53,7 +54,8 @@ class api extends Controller
             $user  = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'email_verified_at' => null,
             ]);
 
             event(new Registered($user));
@@ -64,6 +66,28 @@ class api extends Controller
             ]);
         } else {
             return response()->json(['errors' => $validator->errors()->all()], 401);
+        }
+    }
+
+    public function verify(Request $request)
+    {
+
+        $user = User::findOrFail($request->id);
+
+        if ($user->hasVerifiedEmail()) {
+            return response()->json("User already verified", 200);
+        } else {
+
+            if (!hash_equals((string) $request->hash, sha1($user->getEmailForVerification()))) {
+                return response()->json("Invalid verification code", 401);
+            } else {
+                if ($user->markEmailAsVerified()) {
+                    event(new Verified($user));
+                    return response()->json("Email verified successfully", 200);
+                } else {
+                    return response()->json("Email not verified", 401);
+                }
+            }
         }
     }
     public function home(Request $request)

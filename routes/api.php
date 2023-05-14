@@ -13,8 +13,8 @@ Route::group(['middleware' => ['json']], function () {
     Route::get('users/{id}', [App\Http\Controllers\Api\api::class, 'user']);
     Route::post('login', [App\Http\Controllers\Api\api::class, 'login']);
     Route::post('register', [App\Http\Controllers\Api\api::class, 'register']);
-    Route::get('verification.verify', [App\Http\Controllers\Api\api::class, 'verify'])->name('verification.verify');
-
+    
+    Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Api\api::class, 'verify'])->name('verification.verify');
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
 
