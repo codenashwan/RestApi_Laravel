@@ -13,6 +13,8 @@ Route::group(['middleware' => ['json']], function () {
     Route::get('users/{id}', [App\Http\Controllers\Api\api::class, 'user']);
     Route::post('login', [App\Http\Controllers\Api\api::class, 'login']);
     Route::post('register', [App\Http\Controllers\Api\api::class, 'register']);
+    Route::post('forgot', [App\Http\Controllers\Api\api::class, 'forgot']);
+    Route::post('reset', [App\Http\Controllers\Api\api::class, '/'])->name('password.reset');
 
     Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Api\api::class, 'verify'])->name('verification.verify');
 

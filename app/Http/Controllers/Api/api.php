@@ -10,6 +10,7 @@ use Nette\Utils\Validators;
 use Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Password;
 
 class api extends Controller
 {
@@ -99,6 +100,24 @@ class api extends Controller
             return response()->json("Email verification link sent on your email", 200);
         }
     }
+
+    public function forgot(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+        if (!$validator->fails()) {
+            $status = Password::sendResetLink($request->only('email'));
+            if ($status == Password::RESET_LINK_SENT) {
+                return response()->json(['success' => __($status)], 200);
+            } else {
+                return response()->json(['errors' => __("passwords.throttled")], 401);
+            }
+        } else {
+            return response()->json(['errors' => $validator->errors()->all()], 401);
+        }
+    }
+
     public function home(Request $request)
     {
         info($request->all());
