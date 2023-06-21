@@ -14,12 +14,17 @@ Route::group(['middleware' => ['json']], function () {
     Route::post('login', [App\Http\Controllers\Api\api::class, 'login']);
     Route::post('register', [App\Http\Controllers\Api\api::class, 'register']);
     Route::post('forgot', [App\Http\Controllers\Api\api::class, 'forgot']);
-    Route::post('reset', [App\Http\Controllers\Api\api::class, '/'])->name('password.reset');
+    Route::post('reset', [App\Http\Controllers\Api\api::class, 'reset'])->name('password.reset');
 
     Route::get('verify-email/{id}/{hash}', [App\Http\Controllers\Api\api::class, 'verify'])->name('verification.verify');
 
     Route::group(['middleware' => ['auth:sanctum']], function () {
+
         Route::post('email/verification-notification', [App\Http\Controllers\Api\api::class, 'sendVerificationEmail']);
+        Route::get('profile', [App\Http\Controllers\Api\api::class, 'profile']);
+        Route::get('profile/properties', [App\Http\Controllers\Api\api::class, 'ProfileProperties']);
+        Route::delete('profile/properties/{id}', [App\Http\Controllers\Api\api::class, 'DeleteProperty']);
+
 
 
         Route::post('logout', [App\Http\Controllers\Api\api::class, 'logout']);

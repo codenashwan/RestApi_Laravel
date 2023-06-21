@@ -9,8 +9,10 @@ use App\Models\{contacts, User, cities, properties, categories};
 use Nette\Utils\Validators;
 use Hash;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Password;
+use Auth;
 
 class api extends Controller
 {
@@ -65,6 +67,36 @@ class api extends Controller
                 'token' => $user->createToken('authToken')->plainTextToken,
                 'user' => $user
             ]);
+        } else {
+            return response()->json(['errors' => $validator->errors()->all()], 401);
+        }
+    }
+
+
+    public function reset(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:6',
+        ]);
+        if (!$validator->fails()) {
+            $status = Password::reset(
+                $request->only('email', 'password', 'token'),
+                function ($user) use ($request) {
+                    $user->forceFill([
+                        'password' => Hash::make($request->password),
+                        'remember_token' => \Str::random(60),
+                    ])->save();
+                    $user->tokens()->delete();
+                    event(new PasswordReset($user));
+                }
+            );
+            if ($status == Password::PASSWORD_RESET) {
+                return response()->json(['success' => __('passwords.reset')], 200);
+            } else {
+                return response()->json(['errors' => [__("Something went wrong !")]], 401);
+            }
         } else {
             return response()->json(['errors' => $validator->errors()->all()], 401);
         }
@@ -186,5 +218,26 @@ class api extends Controller
     public function user(Request $request)
     {
         return User::findOrFail($request->id);
+    }
+
+    public function profile(Request $request)
+    {
+        return Auth::user();
+    }
+    public function ProfileProperties(Request $request)
+    {
+        return properties::OfUser(Auth::id())->paginate(10);
+    }
+
+    public function DeleteProperty($id)
+    {
+        $property = properties::where([['id', $id], ['user_id', Auth::id()]])->first();
+
+        if ($property) {
+            $property->delete();
+            return response()->json(['success' => 'Property deleted successfully'], 200);
+        } else {
+            return response()->json(['errors' => 'Property not found'], 401);
+        }
     }
 }

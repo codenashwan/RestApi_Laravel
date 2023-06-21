@@ -28,6 +28,7 @@ return new class extends Migration
             $table->integer('kitchens')->nullable();
             $table->json('address');
             $table->json('images');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -40,6 +41,5 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists('properties');
-        
     }
 };
