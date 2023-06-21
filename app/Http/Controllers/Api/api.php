@@ -240,4 +240,54 @@ class api extends Controller
             return response()->json(['errors' => 'Property not found'], 401);
         }
     }
+
+    public function categories(Request $request)
+    {
+        return categories::latest()->get();
+    }
+    public function cities(Request $request)
+    {
+        return cities::latest()->get();
+    }
+
+    public function AddProperty(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'category_id' => 'required|exists:categories,id',
+            'city_id' => 'required|exists:cities,id',
+            'title' => 'required|min:3',
+            'description' => 'required|min:3',
+            'price' => 'required|numeric',
+            'area' => 'required',
+            'bedrooms' => 'nullable|numeric',
+            'bathrooms' => 'nullable|numeric',
+            'garages' => 'nullable|numeric',
+            'kitchens' => 'nullable|numeric',
+            'address' => 'required|json',
+        ]);
+
+        if (!$validator->fails()) {
+            $property = properties::create([
+                'user_id' => Auth::id(),
+                'category_id' => $request->category_id,
+                'city_id' => $request->city_id,
+                'title' => $request->title,
+                'description' => $request->description,
+                'price' => $request->price,
+                'area' => $request->area,
+                'bedrooms' => $request->bedrooms,
+                'bathrooms' => $request->bathrooms,
+                'garages' => $request->garages,
+                'kitchens' => $request->kitchens,
+                'address' => $request->address,
+            ]);
+            if ($property) {
+                return response()->json(['success' => 'Property added successfully'], 200);
+            } else {
+                return response()->json(['errors' => 'Property not added'], 401);
+            }
+        } else {
+            return response()->json(['errors' => $validator->errors()->all()], 401);
+        }
+    }
 }

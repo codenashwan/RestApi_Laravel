@@ -8,6 +8,8 @@ Route::group(['middleware' => ['json']], function () {
     Route::get('/', [App\Http\Controllers\Api\api::class, 'home']);
     Route::post('contact', [App\Http\Controllers\Api\api::class, 'contact']);
     Route::get('properties', [App\Http\Controllers\Api\api::class, 'properties']);
+    Route::get('categories', [App\Http\Controllers\Api\api::class, 'categories']);
+    Route::get('cities', [App\Http\Controllers\Api\api::class, 'cities']);
     Route::get('properties/{id}', [App\Http\Controllers\Api\api::class, 'property']);
     Route::get('users', [App\Http\Controllers\Api\api::class, 'users']);
     Route::get('users/{id}', [App\Http\Controllers\Api\api::class, 'user']);
@@ -23,6 +25,8 @@ Route::group(['middleware' => ['json']], function () {
         Route::post('email/verification-notification', [App\Http\Controllers\Api\api::class, 'sendVerificationEmail']);
         Route::get('profile', [App\Http\Controllers\Api\api::class, 'profile']);
         Route::get('profile/properties', [App\Http\Controllers\Api\api::class, 'ProfileProperties']);
+        Route::post("profile/properties", [App\Http\Controllers\Api\api::class, 'AddProperty']);
+
         Route::delete('profile/properties/{id}', [App\Http\Controllers\Api\api::class, 'DeleteProperty']);
 
 
