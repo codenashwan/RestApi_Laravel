@@ -26,6 +26,7 @@ Route::group(['middleware' => ['json']], function () {
         Route::get('profile', [App\Http\Controllers\Api\api::class, 'profile']);
         Route::get('profile/properties', [App\Http\Controllers\Api\api::class, 'ProfileProperties']);
         Route::post("profile/properties", [App\Http\Controllers\Api\api::class, 'AddProperty']);
+        Route::post("profile/properties/{id}/image", [App\Http\Controllers\Api\api::class, 'uploadImage']);
 
         Route::delete('profile/properties/{id}', [App\Http\Controllers\Api\api::class, 'DeleteProperty']);
 

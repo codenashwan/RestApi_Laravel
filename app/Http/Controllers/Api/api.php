@@ -13,6 +13,7 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Password;
 use Auth;
+use Image;
 
 class api extends Controller
 {
@@ -285,6 +286,31 @@ class api extends Controller
                 return response()->json(['success' => 'Property added successfully'], 200);
             } else {
                 return response()->json(['errors' => 'Property not added'], 401);
+            }
+        } else {
+            return response()->json(['errors' => $validator->errors()->all()], 401);
+        }
+    }
+
+    public function uploadImage(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpeg,png,jpg',
+        ]);
+
+        if (!$validator->fails()) {
+            $property = properties::where([['user_id', Auth::id()], ['id', $id]])->first();
+            if ($property) {
+                $filename = time() . rand() . '.' . $request->image->getClientOriginalExtension();
+                Image::make($request->image)->save("upload/properties/$filename", 40);
+                $images = $property->images;
+                $images[] = $filename;
+                $property->images = $images;
+                $property->save();
+
+                return response()->json(['success' => 'Image uploaded successfully'], 200);
+            } else {
+                return response()->json(['errors' => 'Property not found'], 401);
             }
         } else {
             return response()->json(['errors' => $validator->errors()->all()], 401);
